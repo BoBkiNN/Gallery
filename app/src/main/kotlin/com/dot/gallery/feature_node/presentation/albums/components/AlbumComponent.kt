@@ -157,6 +157,8 @@ fun AlbumComponent(
                                 )
                             ) {
                                 append(stringResource(R.string.s_items, album.count) + " (${formatSize(album.size)})")
+                                append("\n")
+                                append(album.relativePath)
                             }
                         },
                         textAlign = TextAlign.Center,
