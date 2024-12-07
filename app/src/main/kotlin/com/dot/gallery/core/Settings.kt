@@ -279,6 +279,12 @@ object Settings {
         @Composable
         fun rememberAutoHideOnVideoPlay() =
             rememberPreference(key = AUTO_HIDE_ON_VIDEO_PLAY, defaultValue = true)
+
+        private val HIDE_SELECTION_SHEET_BUTTON_NAMES = booleanPreferencesKey("hide_selection_sheet_button_names")
+
+        @Composable
+        fun rememberHideSelectionSheetButtonNames() =
+            rememberPreference(key = HIDE_SELECTION_SHEET_BUTTON_NAMES, defaultValue = false)
     }
 }
 
