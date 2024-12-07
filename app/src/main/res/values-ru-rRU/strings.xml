@@ -261,7 +261,7 @@
     <string name="update_file_name">Изменить имя файла</string>
     <string name="support_the_project">Поддержать проект</string>
     <string name="click_to_copy">Нажмите, чтобы скопировать</string>
-    <string name="take_audio_focus_title">Забрать аудио фокус</string>
+    <string name="take_audio_focus_title">Забирать аудио фокус</string>
     <string name="take_audio_focus_summary">Когда включено, аудио фокус будет переключен при проигрывании медиа. Медиа проигрываемое в фоне остановится пока видео воспроизводится. (Требуется перезапуск приложения)</string>
     <string name="full_brightness_view_title">Полная яркость при просмотре</string>
     <string name="full_brightness_view_summary">Увеличивать яркость экрана до максимума при просмотре изображений и видео</string>
@@ -276,4 +276,8 @@
         <item quantity="many">%s пунктов</item>
         <item quantity="other">%s пунктов</item>
     </plurals>
+    <string name="hide_selection_sheet_button_names">Скрыть названия кнопок в панели выбора</string>
+    <string name="hide_selection_sheet_button_names_summary">Скрывает текст под кнопками в меню выбора медиа</string>
+    <string name="disable_selected_item_border">Не показывать границы выбранное предмета</string>
+    <string name="disable_selected_item_border_summary">Если включено, границы не будут показываться вокруг выбранных медиа</string>
 </resources>
