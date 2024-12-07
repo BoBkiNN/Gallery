@@ -14,6 +14,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -135,37 +136,38 @@ fun AlbumComponent(
                         uri = album.uri.toString(),
                         contentDescription = album.label
                     )
-                    Text(
-                        text = buildAnnotatedString {
-                            withStyle(
-                                style = SpanStyle(
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                    fontStyle = MaterialTheme.typography.titleLarge.fontStyle,
-                                    fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                                    letterSpacing = MaterialTheme.typography.titleLarge.letterSpacing
+                    Column(Modifier.padding(16.dp).fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (album.isOnSdcard) {
+                                Icon(
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .align(Alignment.CenterVertically),
+                                    imageVector = Icons.Outlined.SdCard,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurface
                                 )
-                            ) {
-                                append(album.label)
                             }
-                            append("\n")
-                            withStyle(
-                                style = SpanStyle(
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    fontStyle = MaterialTheme.typography.bodyMedium.fontStyle,
-                                    fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                                    letterSpacing = MaterialTheme.typography.bodyMedium.letterSpacing
-                                )
-                            ) {
-                                append(stringResource(R.string.s_items, album.count) + " (${formatSize(album.size)})")
-                                append("\n")
-                                append(album.relativePath)
-                            }
-                        },
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth()
-                    )
+                            Text(album.label, color = MaterialTheme.colorScheme.onSurface,
+                                fontStyle = MaterialTheme.typography.titleLarge.fontStyle,
+                                fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                                letterSpacing = MaterialTheme.typography.titleLarge.letterSpacing)
+                        }
+                        val count = pluralStringResource(
+                            id = R.plurals.item_count,
+                            count = album.count.toInt(),
+                            album.count
+                        )
+                        Text(count + " (${formatSize(album.size)})", color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontStyle = MaterialTheme.typography.bodyMedium.fontStyle,
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                            letterSpacing = MaterialTheme.typography.bodyMedium.letterSpacing)
+                        Text(album.volume+album.relativePath, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontStyle = MaterialTheme.typography.bodyMedium.fontStyle,
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                            letterSpacing = MaterialTheme.typography.bodyMedium.letterSpacing, textAlign = TextAlign.Center)
+                    }
                 }
             )
         }

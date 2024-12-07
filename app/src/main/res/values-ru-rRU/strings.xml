@@ -271,10 +271,10 @@
     <string name="delete_location">Удалить локацию</string>
     <string name="delete_metadata">Удалить Метаданные</string>
     <plurals name="item_count">
-        <item quantity="one">%s пункт</item>
-        <item quantity="few">%s пунктов</item>
-        <item quantity="many">%s пунктов</item>
-        <item quantity="other">%s пунктов</item>
+        <item quantity="one">%s элемент</item>
+        <item quantity="few">%s эл.</item>
+        <item quantity="many">%s эл.</item>
+        <item quantity="other">%s эл.</item>
     </plurals>
     <string name="hide_selection_sheet_button_names">Скрыть названия кнопок в панели выбора</string>
     <string name="hide_selection_sheet_button_names_summary">Скрывает текст под кнопками в меню выбора медиа</string>
