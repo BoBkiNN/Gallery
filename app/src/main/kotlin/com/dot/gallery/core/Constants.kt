@@ -28,9 +28,9 @@ object Constants {
     const val WEEKLY_DATE_FORMAT = "EEEE"
     const val DEFAULT_DATE_FORMAT = "EEE, MMMM d"
     const val EXTENDED_DATE_FORMAT = "EEE, MMM d, yyyy"
-    const val FULL_DATE_FORMAT = "EEEE, MMMM d, yyyy, hh:mm a"
-    const val HEADER_DATE_FORMAT = "MMMM d, yyyy\n" + "h:mm a"
-    const val EXIF_DATE_FORMAT = "MMMM d, yyyy • h:mm a"
+    const val FULL_DATE_FORMAT = "EEEE, MMMM d, yyyy, HH:mm"
+    const val HEADER_DATE_FORMAT = "MMMM d, yyyy\n" + "HH:mm"
+    const val EXIF_DATE_FORMAT = "MMMM d, yyyy • HH:mm"
 
     /**
      * Value in ms
@@ -45,7 +45,7 @@ object Constants {
     /**
      * Syncs with status bar fade in/out
      */
-    const val DEFAULT_TOP_BAR_ANIMATION_DURATION = 1000
+    const val DEFAULT_TOP_BAR_ANIMATION_DURATION = 400
 
     /**
      * MAX Image Size in Media Preview
