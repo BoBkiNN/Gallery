@@ -285,6 +285,12 @@ object Settings {
         @Composable
         fun rememberHideSelectionSheetButtonNames() =
             rememberPreference(key = HIDE_SELECTION_SHEET_BUTTON_NAMES, defaultValue = false)
+
+        private val DISABLE_SELECTED_ITEM_BORDER = booleanPreferencesKey("disable_selected_item_border")
+
+        @Composable
+        fun rememberDisableSelectedItemBorder() =
+            rememberPreference(key = DISABLE_SELECTED_ITEM_BORDER, defaultValue = false)
     }
 }
 
