@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.dot.gallery.core.Constants.Animation
+import com.dot.gallery.core.Settings.Misc.rememberDisableSelectedItemBorder
 import com.dot.gallery.core.presentation.components.CheckBox
 import com.dot.gallery.feature_node.domain.model.Media
 import com.dot.gallery.feature_node.domain.util.getUri
@@ -104,6 +105,7 @@ fun <T: Media> MediaImage(
             )
             .aspectRatio(1f)
     ) {
+        val disableBorder by rememberDisableSelectedItemBorder()
         Box(
             modifier = Modifier
                 .align(Alignment.Center)
@@ -113,12 +115,13 @@ fun <T: Media> MediaImage(
                 .background(
                     color = MaterialTheme.colorScheme.surfaceContainerHigh,
                     shape = RoundedCornerShape(selectedShapeSize)
-                )
-                .border(
-                    width = strokeSize,
-                    shape = RoundedCornerShape(selectedShapeSize),
-                    color = strokeColor
-                )
+                ).run {
+                    return@run if (!disableBorder) border(
+                        width = strokeSize,
+                        shape = RoundedCornerShape(selectedShapeSize),
+                        color = strokeColor
+                    ) else this
+                }
         ) {
             AsyncImage(
                 modifier = Modifier

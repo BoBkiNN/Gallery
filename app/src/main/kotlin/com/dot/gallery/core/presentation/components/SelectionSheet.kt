@@ -64,6 +64,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.dot.gallery.R
+import com.dot.gallery.core.Settings.Misc.rememberHideSelectionSheetButtonNames
 import com.dot.gallery.core.Settings.Misc.rememberTrashEnabled
 import com.dot.gallery.feature_node.domain.model.AlbumState
 import com.dot.gallery.feature_node.domain.model.Media
@@ -300,14 +301,18 @@ private fun RowScope.SelectionBarColumn(
             modifier = Modifier
                 .height(32.dp)
         )
-        Spacer(modifier = Modifier.size(4.dp))
-        Text(
-            text = title,
-            modifier = Modifier,
-            fontWeight = FontWeight.Medium,
-            style = MaterialTheme.typography.bodyMedium,
-            color = tintColor,
-            textAlign = TextAlign.Center
-        )
+        val hideButtonNames by rememberHideSelectionSheetButtonNames()
+        if (!hideButtonNames) {
+            Spacer(modifier = Modifier.size(4.dp))
+            Text(
+                text = title,
+                modifier = Modifier,
+                fontWeight = FontWeight.Medium,
+                style = MaterialTheme.typography.bodyMedium,
+                color = tintColor,
+                textAlign = TextAlign.Center
+            )
+        }
+
     }
 }

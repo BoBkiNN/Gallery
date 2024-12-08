@@ -63,8 +63,10 @@ import com.dot.gallery.core.Settings.Misc.rememberAudioFocus
 import com.dot.gallery.core.Settings.Misc.rememberAutoHideNavBar
 import com.dot.gallery.core.Settings.Misc.rememberAutoHideOnVideoPlay
 import com.dot.gallery.core.Settings.Misc.rememberAutoHideSearchBar
+import com.dot.gallery.core.Settings.Misc.rememberDisableSelectedItemBorder
 import com.dot.gallery.core.Settings.Misc.rememberForcedLastScreen
 import com.dot.gallery.core.Settings.Misc.rememberFullBrightnessView
+import com.dot.gallery.core.Settings.Misc.rememberHideSelectionSheetButtonNames
 import com.dot.gallery.core.Settings.Misc.rememberLastScreen
 import com.dot.gallery.core.SettingsEntity
 import com.dot.gallery.feature_node.presentation.settings.components.SettingsAppHeader
@@ -431,6 +433,28 @@ fun rememberSettingsList(
             summary = context.getString(R.string.auto_hide_on_video_play_summary),
             isChecked = autoHideOnVideoPlay,
             onCheck = { autoHideOnVideoPlay = it },
+            screenPosition = Position.Middle
+        )
+    }
+
+    var hideSelectionSheetButtonNames by rememberHideSelectionSheetButtonNames()
+    val hideSelectionSheetButtonNamesPref = remember(hideSelectionSheetButtonNames) {
+        SettingsEntity.SwitchPreference(
+            title = context.getString(R.string.hide_selection_sheet_button_names),
+            summary = context.getString(R.string.hide_selection_sheet_button_names_summary),
+            isChecked = hideSelectionSheetButtonNames,
+            onCheck = { hideSelectionSheetButtonNames = it },
+            screenPosition = Position.Middle
+        )
+    }
+
+    var disableSelectedItemBorders by rememberDisableSelectedItemBorder()
+    val disableSelectedItemBordersPref = remember(disableSelectedItemBorders) {
+        SettingsEntity.SwitchPreference(
+            title = context.getString(R.string.disable_selected_item_border),
+            summary = context.getString(R.string.disable_selected_item_border_summary),
+            isChecked = disableSelectedItemBorders,
+            onCheck = { disableSelectedItemBorders = it },
             screenPosition = Position.Bottom
         )
     }
@@ -495,6 +519,8 @@ fun rememberSettingsList(
             add(audioFocusPref)
             add(fullBrightnessViewPref)
             add(autoHideOnVideoPlayPref)
+            add(hideSelectionSheetButtonNamesPref)
+            add(disableSelectedItemBordersPref)
             /** ********************* **/
             /** ********************* **/
             /** Navigation Section Start **/

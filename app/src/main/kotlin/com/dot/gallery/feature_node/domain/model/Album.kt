@@ -32,8 +32,7 @@ data class Album(
 
     @IgnoredOnParcel
     @Stable
-    val isOnSdcard: Boolean =
-        volume.toLowerCase(Locale.current).matches(".*[0-9a-f]{4}-[0-9a-f]{4}".toRegex())
+    val isOnSdcard: Boolean = volume.matches("/storage/[0-9A-F]{4}-[0-9A-F]{4}/".toRegex())
 
     companion object {
 

@@ -291,4 +291,8 @@
         <item quantity="one">%s item</item>
         <item quantity="other">%s items</item>
     </plurals>
+    <string name="hide_selection_sheet_button_names">Hide button names on selection sheet</string>
+    <string name="hide_selection_sheet_button_names_summary">Hides text below buttons in selection sheet</string>
+    <string name="disable_selected_item_border">Disable selected item borders</string>
+    <string name="disable_selected_item_border_summary">If enabled, no border will be drawn around selected items</string>
 </resources>

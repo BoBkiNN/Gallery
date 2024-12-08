@@ -340,6 +340,18 @@ object Settings {
             rememberPreference(key = WEEKLY_DATE_FORMAT, defaultValue = Constants.WEEKLY_DATE_FORMAT)
 
         fun getSetting(context: Context, key: Preferences.Key<String>) = context.dataStore.data.map { it[key] }
+
+        private val HIDE_SELECTION_SHEET_BUTTON_NAMES = booleanPreferencesKey("hide_selection_sheet_button_names")
+
+        @Composable
+        fun rememberHideSelectionSheetButtonNames() =
+            rememberPreference(key = HIDE_SELECTION_SHEET_BUTTON_NAMES, defaultValue = false)
+
+        private val DISABLE_SELECTED_ITEM_BORDER = booleanPreferencesKey("disable_selected_item_border")
+
+        @Composable
+        fun rememberDisableSelectedItemBorder() =
+            rememberPreference(key = DISABLE_SELECTED_ITEM_BORDER, defaultValue = false)
     }
 }
 
