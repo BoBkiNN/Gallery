@@ -293,4 +293,8 @@
         <item quantity="many">%s пунктов</item>
         <item quantity="other">%s эл.</item>
     </plurals>
+    <string name="hide_selection_sheet_button_names">Скрыть названия кнопок в панели выбора</string>
+    <string name="hide_selection_sheet_button_names_summary">Скрывает текст под кнопками в меню выбора медиа</string>
+    <string name="disable_selected_item_border">Не показывать обводку выбранного медиа</string>
+    <string name="disable_selected_item_border_summary">Если включено, границы не будут показываться вокруг выбранных медиа</string>
 </resources>
