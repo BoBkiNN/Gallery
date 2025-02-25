@@ -1,7 +1,5 @@
 package com.dot.gallery.feature_node.presentation.vault
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
@@ -35,7 +33,6 @@ import com.dot.gallery.feature_node.presentation.util.printError
 import com.dot.gallery.ui.core.Icons
 import com.dot.gallery.ui.core.icons.Encrypted
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun VaultSetup(
     navigateUp: () -> Unit,

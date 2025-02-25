@@ -7,10 +7,15 @@ package com.dot.gallery.feature_node.presentation.albums
 
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -34,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -61,8 +67,10 @@ import com.dot.gallery.feature_node.presentation.albums.components.AlbumComponen
 import com.dot.gallery.feature_node.presentation.albums.components.CarouselPinnedAlbums
 import com.dot.gallery.feature_node.presentation.search.MainSearchBar
 import com.dot.gallery.feature_node.presentation.util.Screen
+import com.dot.gallery.feature_node.presentation.util.mediaSharedElement
 import com.dot.gallery.feature_node.presentation.util.rememberActivityResult
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun AlbumsScreen(
     navigate: (route: String) -> Unit,
@@ -75,7 +83,9 @@ fun AlbumsScreen(
     searchBarActive: MutableState<Boolean>,
     onAlbumClick: (Album) -> Unit,
     onAlbumLongClick: (Album) -> Unit,
-    onMoveAlbumToTrash: (ActivityResultLauncher<IntentSenderRequest>, Album) -> Unit
+    onMoveAlbumToTrash: (ActivityResultLauncher<IntentSenderRequest>, Album) -> Unit,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
 ) {
     var lastCellIndex by rememberAlbumGridSize()
 
@@ -102,13 +112,19 @@ fun AlbumsScreen(
     var finalPaddingValues by remember(paddingValues) { mutableStateOf(paddingValues) }
 
     Scaffold(
+        modifier = Modifier.padding(
+            start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
+            end = paddingValues.calculateEndPadding(LocalLayoutDirection.current)
+        ),
         topBar = {
             MainSearchBar(
                 bottomPadding = paddingValues.calculateBottomPadding(),
                 navigate = navigate,
                 toggleNavbar = toggleNavbar,
                 isScrolling = isScrolling,
-                activeState = searchBarActive
+                activeState = searchBarActive,
+                sharedTransitionScope = sharedTransitionScope,
+                animatedContentScope = animatedContentScope,
             ) {
                 IconButton(onClick = { navigate(Screen.SettingsScreen.route) }) {
                     Icon(
@@ -186,15 +202,24 @@ fun AlbumsScreen(
                     key = { item -> item.toString() }
                 ) { item ->
                     val trashResult = rememberActivityResult()
-                    AlbumComponent(
-                        modifier = Modifier.pinchItem(key = item.toString()),
-                        album = item,
-                        onItemClick = onAlbumClick,
-                        onTogglePinClick = onAlbumLongClick,
-                        onMoveAlbumToTrash = {
-                            onMoveAlbumToTrash(trashResult, it)
-                        }
-                    )
+                    with(sharedTransitionScope) {
+                        AlbumComponent(
+                            modifier = Modifier
+                                .pinchItem(key = item.toString())
+                                .animateItem(),
+                            thumbnailModifier = Modifier
+                                .mediaSharedElement(
+                                    album = item,
+                                    animatedVisibilityScope = animatedContentScope
+                                ),
+                            album = item,
+                            onItemClick = onAlbumClick,
+                            onTogglePinClick = onAlbumLongClick,
+                            onMoveAlbumToTrash = {
+                                onMoveAlbumToTrash(trashResult, it)
+                            }
+                        )
+                    }
                 }
 
                 item(

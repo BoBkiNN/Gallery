@@ -23,8 +23,8 @@ android {
         applicationId = "com.dot.gallery"
         minSdk = 30
         targetSdk = 35
-        versionCode = 31101
-        versionName = "3.1.1"
+        versionCode = 31209
+        versionName = "3.1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -160,6 +160,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.lifecycle.process)
     runtimeOnly(libs.androidx.profileinstaller)
     implementation(project(":libs:cropper"))
     "baselineProfile"(project(mapOf("path" to ":baselineprofile")))
@@ -179,6 +180,7 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material.icons.extended)
     implementation(libs.androidx.graphics.shapes)
+    implementation(libs.androidx.startup.runtime)
 
     // Compose - Shimmer
     implementation(libs.compose.shimmer)

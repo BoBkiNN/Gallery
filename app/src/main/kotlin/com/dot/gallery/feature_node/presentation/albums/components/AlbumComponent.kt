@@ -59,6 +59,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun AlbumComponent(
     modifier: Modifier = Modifier,
+    thumbnailModifier: Modifier = Modifier,
     album: Album,
     isEnabled: Boolean = true,
     onItemClick: (Album) -> Unit,
@@ -176,6 +177,7 @@ fun AlbumComponent(
                 .aspectRatio(1f)
         ) {
             AlbumImage(
+                modifier = thumbnailModifier,
                 album = album,
                 isEnabled = isEnabled,
                 onItemClick = onItemClick,
@@ -231,6 +233,7 @@ fun AlbumComponent(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AlbumImage(
+    modifier: Modifier = Modifier,
     album: Album,
     isEnabled: Boolean,
     onItemClick: (Album) -> Unit,
@@ -246,7 +249,7 @@ fun AlbumImage(
             imageVector = Icons.Outlined.AddCircleOutline,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .border(
                     width = 1.dp,
@@ -271,7 +274,7 @@ fun AlbumImage(
         )
     } else {
         AsyncImage(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .border(
                     width = 1.dp,

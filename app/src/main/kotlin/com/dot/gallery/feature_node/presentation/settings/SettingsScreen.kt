@@ -68,6 +68,7 @@ import com.dot.gallery.core.Settings.Misc.rememberForcedLastScreen
 import com.dot.gallery.core.Settings.Misc.rememberFullBrightnessView
 import com.dot.gallery.core.Settings.Misc.rememberHideSelectionSheetButtonNames
 import com.dot.gallery.core.Settings.Misc.rememberLastScreen
+import com.dot.gallery.core.Settings.Misc.rememberVideoAutoplay
 import com.dot.gallery.core.SettingsEntity
 import com.dot.gallery.feature_node.presentation.settings.components.SettingsAppHeader
 import com.dot.gallery.feature_node.presentation.settings.components.SettingsItem
@@ -455,6 +456,17 @@ fun rememberSettingsList(
             summary = context.getString(R.string.disable_selected_item_border_summary),
             isChecked = disableSelectedItemBorders,
             onCheck = { disableSelectedItemBorders = it },
+            screenPosition = Position.Middle
+        )
+    }
+
+    var autoPlayVideo by rememberVideoAutoplay()
+    val autoPlayVideoPref = remember(autoPlayVideo) {
+        SettingsEntity.SwitchPreference(
+            title = context.getString(R.string.auto_play_video),
+            summary = context.getString(R.string.auto_play_video_summary),
+            isChecked = autoPlayVideo,
+            onCheck = { autoPlayVideo = it },
             screenPosition = Position.Bottom
         )
     }
@@ -476,6 +488,18 @@ fun rememberSettingsList(
             summary = context.getString(R.string.date_header_summary),
             onClick = { navigate(Screen.DateFormatScreen()) },
             screenPosition = Position.Top
+        )
+    }
+
+    var sharedElements by Settings.Misc.rememberSharedElements()
+
+    val sharedElementsPref = remember(sharedElements) {
+        SettingsEntity.SwitchPreference(
+            title = context.getString(R.string.shared_elements),
+            summary = context.getString(R.string.shared_elements_summary),
+            isChecked = sharedElements,
+            onCheck = { sharedElements = it },
+            screenPosition = Position.Bottom
         )
     }
 
@@ -521,6 +545,8 @@ fun rememberSettingsList(
             add(autoHideOnVideoPlayPref)
             add(hideSelectionSheetButtonNamesPref)
             add(disableSelectedItemBordersPref)
+            add(autoPlayVideoPref)
+            add(sharedElementsPref)
             /** ********************* **/
             /** ********************* **/
             /** Navigation Section Start **/

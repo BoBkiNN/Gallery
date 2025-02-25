@@ -142,7 +142,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun <T : Media> MediaViewDetails(
     albumsState: State<AlbumState>,
-    vaultState: VaultState,
+    vaultState: State<VaultState>,
     currentMedia: T?,
     handler: MediaHandleUseCase?,
     addMediaToVault: (Vault, T) -> Unit,
@@ -631,7 +631,7 @@ fun MediaInfoChip2(
 private fun <T : Media> MediaViewInfoActions2(
     media: T,
     albumsState: State<AlbumState>,
-    vaults: VaultState,
+    vaults: State<VaultState>,
     handler: MediaHandleUseCase?,
     addMedia: (Vault, T) -> Unit,
     restoreMedia: ((Vault, T, () -> Unit) -> Unit)?,
@@ -650,7 +650,7 @@ private fun <T : Media> MediaViewInfoActions2(
         if (media.isLocalContent) {
             HideButton(
                 media,
-                vaults = vaults,
+                vaults = vaults.value,
                 addMedia = addMedia,
                 followTheme = true,
                 enabled = true
@@ -682,13 +682,12 @@ private fun <T : Media> MediaViewInfoActions2(
 
 @Composable
 fun <T : Media> MediaViewActions2(
-    currentIndex: Int,
     currentMedia: T?,
     handler: MediaHandleUseCase?,
-    onDeleteMedia: ((Int) -> Unit)?,
     showDeleteButton: Boolean,
     enabled: Boolean,
     deleteMedia: ((Vault, T, () -> Unit) -> Unit)?,
+    restoreMedia: ((Vault, T, () -> Unit) -> Unit)?,
     currentVault: Vault?
 ) {
     if (currentMedia != null) {
@@ -703,7 +702,6 @@ fun <T : Media> MediaViewActions2(
                 enabled = enabled
             ) {
                 scope.launch {
-                    onDeleteMedia?.invoke(currentIndex)
                     handler!!.trashMedia(result = result, arrayListOf(it), trash = false)
                 }
             }
@@ -715,7 +713,6 @@ fun <T : Media> MediaViewActions2(
                 enabled = enabled
             ) {
                 scope.launch {
-                    onDeleteMedia?.invoke(currentIndex)
                     handler!!.deleteMedia(result = result, arrayListOf(it))
                 }
             }
@@ -726,6 +723,17 @@ fun <T : Media> MediaViewActions2(
             if (handler != null && currentMedia.canMakeActions) {
                 FavoriteButton(currentMedia, handler, enabled = enabled)
             }
+            if (currentMedia.readUriOnly) {
+                OpenAsButton(currentMedia, enabled = enabled)
+            }
+            // Restore
+            if (currentMedia.isEncrypted && restoreMedia != null && currentVault != null) {
+                RestoreButton(
+                    currentMedia,
+                    currentVault = currentVault,
+                    restoreMedia = restoreMedia
+                )
+            }
             // Edit
             if (!currentMedia.isEncrypted) {
                 EditButton(currentMedia, enabled = enabled)
@@ -733,14 +741,11 @@ fun <T : Media> MediaViewActions2(
             // Trash Component
             if (showDeleteButton) {
                 TrashButton(
-                    currentIndex,
-                    currentMedia,
-                    handler,
-                    false,
+                    media = currentMedia,
+                    handler = handler,
                     enabled = enabled,
-                    onDeleteMedia,
-                    currentVault = currentVault,
-                    deleteMedia = deleteMedia
+                    deleteMedia = deleteMedia,
+                    currentVault = currentVault
                 )
             }
         }
@@ -990,12 +995,10 @@ fun <T : Media> OpenAsButton(
 
 @Composable
 fun <T : Media> TrashButton(
-    index: Int,
     media: T,
     handler: MediaHandleUseCase?,
     followTheme: Boolean = false,
     enabled: Boolean,
-    onDeleteMedia: ((Int) -> Unit)?,
     deleteMedia: ((Vault, T, () -> Unit) -> Unit)?,
     currentVault: Vault?
 ) {
@@ -1003,14 +1006,13 @@ fun <T : Media> TrashButton(
     val state = rememberAppBottomSheetState()
     val scope = rememberCoroutineScope()
     val trashEnabled = rememberTrashEnabled()
-    val trashEnabledRes = remember(trashEnabled) {
-        if (trashEnabled.value) R.string.trash else R.string.trash_delete
+    val trashEnabledRes = remember(trashEnabled, media) {
+        if (trashEnabled.value && !media.isEncrypted) R.string.trash else R.string.trash_delete
     }
     val result = rememberActivityResult {
         scope.launch {
             state.hide()
             shouldMoveToTrash = true
-            onDeleteMedia?.invoke(index)
         }
     }
     BottomBarColumn(
@@ -1040,9 +1042,7 @@ fun <T : Media> TrashButton(
     ) {
         if (deleteMedia != null && currentVault != null) {
             it.forEach { media ->
-                deleteMedia(currentVault, media) {
-                    onDeleteMedia?.invoke(index)
-                }
+                deleteMedia(currentVault, media) {}
             }
         } else {
             if (shouldMoveToTrash) {

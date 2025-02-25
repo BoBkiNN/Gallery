@@ -28,6 +28,8 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ShareCompat
 import androidx.core.content.FileProvider
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.scale
 import androidx.core.net.toFile
 import androidx.exifinterface.media.ExifInterface
 import com.dot.gallery.BuildConfig
@@ -68,12 +70,12 @@ fun resizeBitmap(bitmap: Bitmap, maxWidth: Int, maxHeight: Int): Bitmap {
         newWidth = (maxHeight * aspectRatio).toInt()
     }
 
-    return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
+    return bitmap.scale(newWidth, newHeight)
 }
 
 fun overlayBitmaps(currentImage: Bitmap, markupBitmap: Bitmap): Bitmap {
     // Create a new bitmap with the same dimensions as the current image
-    val resultBitmap = Bitmap.createBitmap(
+    val resultBitmap = createBitmap(
         currentImage.width,
         currentImage.height,
         currentImage.config ?: Bitmap.Config.ARGB_8888
@@ -152,6 +154,11 @@ fun <T: Media> List<T>.writeRequest(
 ) = IntentSenderRequest.Builder(MediaStore.createWriteRequest(contentResolver, map { it.getUri() }))
     .build()
 
+fun Uri.writeRequest(
+    contentResolver: ContentResolver,
+) = IntentSenderRequest.Builder(MediaStore.createWriteRequest(contentResolver, arrayListOf(this)))
+    .build()
+
 @Composable
 fun <T: Media> rememberMediaInfo(
     media: T,
@@ -213,7 +220,7 @@ fun Context.uriToPath(uri: Uri?): String? {
 }
 
 fun Uri.authorizedUri(context: Context): Uri = if (this.toString()
-        .startsWith("content://media/")
+        .startsWith("content://")
 ) this else FileProvider.getUriForFile(
     context,
     BuildConfig.CONTENT_AUTHORITY,
@@ -223,7 +230,7 @@ fun Uri.authorizedUri(context: Context): Uri = if (this.toString()
 fun <T: Media> Context.shareMedia(media: T) {
     val originalUri = media.getUri()
     val uri = if (originalUri.toString()
-            .startsWith("content://media/")
+            .startsWith("content://")
     ) originalUri else FileProvider.getUriForFile(
         this,
         BuildConfig.CONTENT_AUTHORITY,

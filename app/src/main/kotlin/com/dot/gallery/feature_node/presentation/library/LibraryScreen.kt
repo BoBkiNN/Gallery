@@ -1,6 +1,9 @@
 package com.dot.gallery.feature_node.presentation.library
 
 import android.os.Build
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -8,6 +11,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -49,6 +54,7 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -65,16 +71,20 @@ import com.dot.gallery.feature_node.presentation.library.components.LibrarySmall
 import com.dot.gallery.feature_node.presentation.library.components.dashedBorder
 import com.dot.gallery.feature_node.presentation.search.MainSearchBar
 import com.dot.gallery.feature_node.presentation.util.Screen
+import com.dot.gallery.feature_node.presentation.util.mediaSharedElement
 import com.dot.gallery.ui.core.icons.Encrypted
 import com.dot.gallery.ui.core.Icons as GalleryIcons
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun LibraryScreen(
     navigate: (route: String) -> Unit,
     toggleNavbar: (Boolean) -> Unit,
     paddingValues: PaddingValues,
     isScrolling: MutableState<Boolean>,
-    searchBarActive: MutableState<Boolean>
+    searchBarActive: MutableState<Boolean>,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
 ) {
     val viewModel = hiltViewModel<LibraryViewModel>()
     var lastCellIndex by rememberAlbumGridSize()
@@ -101,13 +111,19 @@ fun LibraryScreen(
     var noClassification by rememberNoClassification()
 
     Scaffold(
+        modifier = Modifier.padding(
+            start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
+            end = paddingValues.calculateEndPadding(LocalLayoutDirection.current)
+        ),
         topBar = {
             MainSearchBar(
                 bottomPadding = paddingValues.calculateBottomPadding(),
                 navigate = navigate,
                 toggleNavbar = toggleNavbar,
                 isScrolling = isScrolling,
-                activeState = searchBarActive
+                activeState = searchBarActive,
+                sharedTransitionScope = sharedTransitionScope,
+                animatedContentScope = animatedContentScope
             ) {
                 IconButton(onClick = { navigate(Screen.SettingsScreen()) }) {
                     Icon(
@@ -291,21 +307,36 @@ fun LibraryScreen(
                                             items = medias,
                                             key = { it }
                                         ) {
-                                            MediaImage(
-                                                modifier = Modifier
-                                                    .size(116.dp)
-                                                    .clip(RoundedCornerShape(16.dp)),
-                                                media = it,
-                                                selectedMedia = remember { mutableStateListOf() },
-                                                selectionState = remember { mutableStateOf(false) },
-                                                onItemClick = { media ->
-                                                    navigate(Screen.MediaViewScreen.idAndCategory(media.id, category!!))
-                                                },
-                                                onItemLongClick = {
-                                                    navigate(Screen.CategoryViewScreen.category(category!!))
-                                                },
-                                                canClick = true
-                                            )
+                                            with(sharedTransitionScope) {
+                                                MediaImage(
+                                                    modifier = Modifier
+                                                        .size(116.dp)
+                                                        .clip(RoundedCornerShape(16.dp))
+                                                        .mediaSharedElement(
+                                                            media = it,
+                                                            animatedVisibilityScope = animatedContentScope
+                                                        ),
+                                                    media = it,
+                                                    selectedMedia = remember { mutableStateListOf() },
+                                                    selectionState = remember { mutableStateOf(false) },
+                                                    onItemClick = { media ->
+                                                        navigate(
+                                                            Screen.MediaViewScreen.idAndCategory(
+                                                                media.id,
+                                                                category!!
+                                                            )
+                                                        )
+                                                    },
+                                                    onItemLongClick = {
+                                                        navigate(
+                                                            Screen.CategoryViewScreen.category(
+                                                                category!!
+                                                            )
+                                                        )
+                                                    },
+                                                    canClick = true
+                                                )
+                                            }
                                         }
                                     }
                                 }

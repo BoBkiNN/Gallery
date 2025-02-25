@@ -352,6 +352,18 @@ object Settings {
         @Composable
         fun rememberDisableSelectedItemBorder() =
             rememberPreference(key = DISABLE_SELECTED_ITEM_BORDER, defaultValue = false)
+
+        private val VIDEO_AUTOPLAY = booleanPreferencesKey("video_autoplay")
+
+        @Composable
+        fun rememberVideoAutoplay() =
+            rememberPreference(key = VIDEO_AUTOPLAY, defaultValue = true)
+
+        private val SHARED_ELEMENTS = booleanPreferencesKey("shared_elements")
+
+        @Composable
+        fun rememberSharedElements() =
+            rememberPreference(key = SHARED_ELEMENTS, defaultValue = true)
     }
 }
 

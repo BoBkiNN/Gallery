@@ -9,7 +9,6 @@ import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -34,37 +33,36 @@ import androidx.core.view.WindowCompat
 import com.dot.gallery.R
 import com.dot.gallery.core.Constants
 import com.dot.gallery.feature_node.domain.model.Media
-import com.dot.gallery.feature_node.domain.model.Media.UriMedia
-import com.dot.gallery.feature_node.presentation.picker.PickerActivity.Companion.EXPORT_AS_MEDIA
-import com.dot.gallery.feature_node.presentation.picker.PickerActivity.Companion.MEDIA_LIST
 import com.dot.gallery.feature_node.presentation.picker.components.PickerScreen
 import com.dot.gallery.ui.theme.GalleryTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
-class PickerActivityContract : ActivityResultContract<Any?, List<UriMedia>>() {
+class PickerActivityContract : ActivityResultContract<Any?, List<Uri>>() {
 
     override fun createIntent(context: Context, input: Any?): Intent {
         return Intent(context, PickerActivity::class.java).apply {
             type = "*/*"
             putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-            putExtra(EXPORT_AS_MEDIA, true)
         }
     }
 
-    @Suppress("UNCHECKED_CAST", "DEPRECATION")
-    override fun parseResult(resultCode: Int, intent: Intent?): List<UriMedia> {
+    override fun parseResult(resultCode: Int, intent: Intent?): List<Uri> {
         if (resultCode != Activity.RESULT_OK || intent == null) {
             return emptyList()
         }
 
-        val list: List<UriMedia> = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableArrayExtra(MEDIA_LIST, UriMedia::class.java)?.toList() ?: emptyList()
-        } else {
-            (intent.getParcelableArrayExtra(MEDIA_LIST) as Array<out UriMedia>?)?.toList() ?: emptyList()
+
+        return mutableListOf<Uri>().apply {
+            intent.clipData?.let { clipData ->
+                for (i in 0 until clipData.itemCount) {
+                    add(clipData.getItemAt(i).uri)
+                }
+            } ?: intent.data?.let { add(it) }
         }
-        return list
     }
 }
 
@@ -142,7 +140,7 @@ class PickerActivity : ComponentActivity() {
         if (exportAsMedia) {
             val newIntent = Intent().apply {
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                putExtra(MEDIA_LIST, selectedMedia.toTypedArray())
+                putExtra(MEDIA_LIST, Json.encodeToString(selectedMedia.toTypedArray()))
             }
             setResult(RESULT_OK, newIntent)
             finish()
@@ -169,8 +167,8 @@ class PickerActivity : ComponentActivity() {
         }
     }
 
-    private val String?.pickImage: Boolean get() = this?.startsWith("image") ?: false
-    private val String?.pickVideo: Boolean get() = this?.startsWith("video") ?: false
+    private val String?.pickImage: Boolean get() = this?.startsWith("image") == true
+    private val String?.pickVideo: Boolean get() = this?.startsWith("video") == true
     private val String?.pickAny: Boolean get() = this == "*/*"
     private val String?.allowedMedia: AllowedMedia
         get() = if (pickImage) AllowedMedia.PHOTOS

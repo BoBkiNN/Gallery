@@ -15,6 +15,9 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.dot.gallery.feature_node.data.data_source.InternalDatabase
 import com.dot.gallery.feature_node.domain.model.Media
+import com.dot.gallery.feature_node.domain.model.MediaVersion
+import com.dot.gallery.feature_node.domain.repository.MediaRepository
+import com.dot.gallery.feature_node.presentation.util.mediaStoreVersion
 import com.dot.gallery.feature_node.presentation.util.printWarning
 import com.github.panpf.sketch.BitmapImage
 import com.github.panpf.sketch.SingletonSketch
@@ -23,12 +26,15 @@ import com.github.panpf.sketch.request.ImageRequest
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @HiltWorker
 class ClassifierWorker @AssistedInject constructor(
     private val database: InternalDatabase,
+    private val repository: MediaRepository,
     @Assisted private val appContext: Context,
     @Assisted workerParams: WorkerParameters
 ) : CoroutineWorker(appContext, workerParams), ImageClassifierHelper.ClassifierListener {
@@ -39,19 +45,30 @@ class ClassifierWorker @AssistedInject constructor(
             val blacklisted = database.getBlacklistDao().getBlacklistedAlbumsAsync()
             var media = database.getMediaDao().getMedia()
                 .filterNot { item -> blacklisted.any { it.matchesMedia(item) } }
-            printWarning("ClassifierWorker allowed media size: ${media.size}")
             if (media.isEmpty()) {
-                printWarning("ClassifierWorker media is empty, we can abort")
-                return@withContext Result.success()
+                printWarning("ClassifierWorker media is empty, let's try and update the database")
+                val mediaVersion = appContext.mediaStoreVersion
+                printWarning("ClassifierWorker Force-updating database to version $mediaVersion")
+                database.getMediaDao().setMediaVersion(MediaVersion(mediaVersion))
+                val fetchedMedia =
+                    repository.getMedia().map { it.data ?: emptyList() }.firstOrNull()
+                fetchedMedia?.let {
+                    database.getMediaDao().updateMedia(it)
+                    database.getClassifierDao().deleteDeclassifiedImages(it.fastMap { m -> m.id })
+                }
             }
+            media = database.getMediaDao().getMedia()
+                .filterNot { item -> blacklisted.any { it.matchesMedia(item) } }
+            printWarning("ClassifierWorker allowed media size: ${media.size}")
 
             printWarning("ClassifierWorker cleaning up declassified results")
             database.getClassifierDao().deleteDeclassifiedImages(media.fastMap { it.id })
 
-            printWarning("ClassifierWorker retrieving classified media")
-            val classified = database.getClassifierDao().getClassifiedMedia()
+            printWarning("ClassifierWorker retrieving already checked media")
+            val classified = database.getClassifierDao().getCheckedMedia()
             printWarning("ClassifierWorker classified media size: ${classified.size}")
-            media = media.filterNot { item -> classified.any { it.id == item.id && it.timestamp == item.timestamp } }
+            media =
+                media.filterNot { item -> classified.any { it.id == item.id && it.timestamp == item.timestamp } }
             if (media.isEmpty()) {
                 printWarning("ClassifierWorker media is empty, we can abort")
                 setProgress(workDataOf("progress" to 100))
@@ -148,7 +165,11 @@ fun WorkManager.startClassification(indexStart: Int = 0, size: Int = 50) {
         .setInputData(inputData)
         .build()
 
-    enqueueUniqueWork("ClassifierWorker_${indexStart}_$size", ExistingWorkPolicy.REPLACE, uniqueWork)
+    enqueueUniqueWork(
+        "ClassifierWorker_${indexStart}_$size",
+        ExistingWorkPolicy.REPLACE,
+        uniqueWork
+    )
 }
 
 fun WorkManager.stopClassification() {

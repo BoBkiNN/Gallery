@@ -19,11 +19,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.dot.gallery.R
 import com.dot.gallery.core.presentation.components.DragHandle
 import com.dot.gallery.feature_node.domain.model.Vault
 import com.dot.gallery.feature_node.domain.model.VaultState
@@ -89,7 +91,7 @@ fun SelectVaultSheet(
                                 letterSpacing = MaterialTheme.typography.titleLarge.letterSpacing
                             )
                         ) {
-                            append("Select a vault")
+                            append(stringResource(R.string.select_a_vault))
                         }
                     },
                     textAlign = TextAlign.Center,

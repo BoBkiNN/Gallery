@@ -26,6 +26,12 @@ data class Album(
     val isPinned: Boolean = false,
 ) : Parcelable {
 
+    val key: String
+        get() = "{$id, $uri, $timestamp}"
+
+    val idLessKey: String
+        get() = "{$uri, $timestamp}"
+
     @IgnoredOnParcel
     @Stable
     val volume: String = pathToThumbnail.substringBeforeLast("/").removeSuffix(relativePath.removeSuffix("/"))
