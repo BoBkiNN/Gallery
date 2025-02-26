@@ -467,7 +467,7 @@ fun rememberSettingsList(
             summary = context.getString(R.string.auto_play_video_summary),
             isChecked = autoPlayVideo,
             onCheck = { autoPlayVideo = it },
-            screenPosition = Position.Bottom
+            screenPosition = Position.Middle
         )
     }
 
