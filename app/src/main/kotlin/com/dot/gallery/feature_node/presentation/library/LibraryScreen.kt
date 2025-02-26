@@ -1,6 +1,5 @@
 package com.dot.gallery.feature_node.presentation.library
 
-import android.os.Build
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
