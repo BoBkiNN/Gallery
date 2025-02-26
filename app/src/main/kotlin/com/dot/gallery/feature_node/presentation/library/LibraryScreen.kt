@@ -201,19 +201,17 @@ fun LibraryScreen(
                                 Alignment.CenterHorizontally
                             )
                         ) {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                LibrarySmallItem(
-                                    title = stringResource(R.string.vault),
-                                    icon = GalleryIcons.Encrypted,
-                                    contentColor = MaterialTheme.colorScheme.secondary,
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .clickable {
-                                            navigate(Screen.VaultScreen())
-                                        },
-                                    contentDescription = stringResource(R.string.vault)
-                                )
-                            }
+                            LibrarySmallItem(
+                                title = stringResource(R.string.vault),
+                                icon = GalleryIcons.Encrypted,
+                                contentColor = MaterialTheme.colorScheme.secondary,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clickable {
+                                        navigate(Screen.VaultScreen())
+                                    },
+                                contentDescription = stringResource(R.string.vault)
+                            )
 
                             LibrarySmallItem(
                                 title = stringResource(R.string.ignored),
